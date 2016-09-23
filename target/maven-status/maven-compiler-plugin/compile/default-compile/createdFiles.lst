@@ -1,0 +1,13 @@
+com\github\andersonfonseka\dto\CityDTO.class
+com\github\andersonfonseka\dto\GenericBeanDTO.class
+com\github\andersonfonseka\domain\City.class
+com\github\andersonfonseka\domain\Person.class
+com\github\andersonfonseka\domain\Contact.class
+com\github\andersonfonseka\dto\ContactDTO.class
+com\github\andersonfonseka\dto\PersonDTO.class
+com\github\andersonfonseka\dto\SchoolDTO.class
+com\github\andersonfonseka\domain\GenericBean.class
+com\github\andersonfonseka\domain\School.class
+com\github\andersonfonseka\core\JavaBeanUtils.class
+com\github\andersonfonseka\domain\Address.class
+com\github\andersonfonseka\dto\AddressDTO.class
