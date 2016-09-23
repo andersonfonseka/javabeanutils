@@ -26,6 +26,6 @@ reference: https://maven.apache.org/guides/mini/guide-3rd-party-jars-local.html
 How to use:
 
 - See JavaBeanUtilsTest - JUnit Test Case
-- The Domain and DTO packages contains both: source and target objects written in unit test case class. 
+- The Domain and DTO packages contains both: source and target objects written in the unit test case. 
 
 
