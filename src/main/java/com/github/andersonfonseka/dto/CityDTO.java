@@ -1,35 +1,15 @@
 package com.github.andersonfonseka.dto;
 
-public class CityDTO {
+public class CityDTO extends GenericDescriptionBeanDTO {
 	
-	private String name;
+	private ProvinceDTO province;
 
-	private String province;
-	
-	private String country;
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getProvince() {
+	public ProvinceDTO getProvince() {
 		return province;
 	}
 
-	public void setProvince(String province) {
+	public void setProvince(ProvinceDTO province) {
 		this.province = province;
-	}
-
-	public String getCountry() {
-		return country;
-	}
-
-	public void setCountry(String country) {
-		this.country = country;
 	}
 	
 }

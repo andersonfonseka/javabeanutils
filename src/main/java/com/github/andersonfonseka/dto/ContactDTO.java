@@ -1,18 +1,8 @@
 package com.github.andersonfonseka.dto;
 
-public class ContactDTO {
-	
-	private String number;
+public class ContactDTO extends GenericDescriptionBeanDTO {
 	
 	private String type;
-
-	public String getNumber() {
-		return number;
-	}
-
-	public void setNumber(String number) {
-		this.number = number;
-	}
 
 	public String getType() {
 		return type;

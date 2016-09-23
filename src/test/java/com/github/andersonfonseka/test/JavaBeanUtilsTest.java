@@ -6,7 +6,9 @@ import com.github.andersonfonseka.core.JavaBeanUtils;
 import com.github.andersonfonseka.domain.Address;
 import com.github.andersonfonseka.domain.City;
 import com.github.andersonfonseka.domain.Contact;
+import com.github.andersonfonseka.domain.Country;
 import com.github.andersonfonseka.domain.Person;
+import com.github.andersonfonseka.domain.Province;
 import com.github.andersonfonseka.domain.School;
 import com.github.andersonfonseka.dto.SchoolDTO;
 
@@ -24,17 +26,32 @@ public class JavaBeanUtilsTest {
 		person2.setName("Sophia Fonseca");
 
 		Contact contact = new Contact();
-		contact.setNumber("5581992440951");
+		contact.setId(1L);
+		contact.setDescription("5581992440951");
 		contact.setType("mobile");
+		
+		Contact contact2 = new Contact();
+		contact2.setId(2L);
+		contact2.setDescription("sophia.fonseka@gmail.com");
+		contact2.setType("email");
 
 		Address address = new Address();
 		address.setStreet("Manoel Graciliano de Souza");
 		address.setZipCode("53140160");
 
+		Country country = new Country();
+		country.setId(1L);
+		country.setDescription("BR");
+		
+		Province province = new Province();
+		province.setId(1L);
+		province.setDescription("PE");
+		province.setCountry(country);
+		
 		City city = new City();
-		city.setName("Recife");
-		city.setCountry("BR");
-		city.setProvince("PE");
+		city.setId(1L);
+		city.setDescription("Olinda");
+		city.setProvince(province);
 
 		address.setCity(city);
 
@@ -42,11 +59,11 @@ public class JavaBeanUtilsTest {
 		person.addContactList(contact);
 
 		person2.addAddressList(address);
-		person2.addContactList(contact);
+		person2.addContactList(contact2);
 
 		School school = new School();
 		school.setId(1L);
-		school.setName("UPFE-CIn");
+		school.setDescription("UPFE-CIn");
 
 		school.addPerson(person);
 		school.addPerson(person2);

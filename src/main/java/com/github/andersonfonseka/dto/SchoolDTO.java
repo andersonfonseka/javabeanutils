@@ -3,19 +3,10 @@ package com.github.andersonfonseka.dto;
 import java.util.Collection;
 import java.util.Vector;
 
-public class SchoolDTO extends GenericBeanDTO {
-	
-	private String name;
+public class SchoolDTO extends GenericDescriptionBeanDTO {
 	
 	private Collection<PersonDTO> persons = new Vector<PersonDTO>();
 
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
 	
 	public Collection<PersonDTO> getPersons() {
 		return persons;

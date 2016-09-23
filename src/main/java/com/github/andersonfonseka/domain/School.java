@@ -3,19 +3,10 @@ package com.github.andersonfonseka.domain;
 import java.util.Collection;
 import java.util.Vector;
 
-public class School extends GenericBean {
-	
-	private String name;
+public class School extends GenericDescriptionBean {
 	
 	private Collection<Person> persons = new Vector<Person>();
 
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
 	
 	public Collection<Person> getPersons() {
 		return persons;

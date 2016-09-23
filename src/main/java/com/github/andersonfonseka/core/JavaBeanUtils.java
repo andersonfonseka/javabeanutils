@@ -19,8 +19,8 @@ public class JavaBeanUtils {
 	public void copyProperties(Object source, Object target) throws Exception {
 		
 		List<Method> sourceMethods = new ArrayList<Method>();
-					 sourceMethods.addAll(Arrays.asList(source.getClass().getSuperclass().getDeclaredMethods()));
-					 sourceMethods.addAll(Arrays.asList(source.getClass().getDeclaredMethods()));
+		getSuperClassDeclaredMethods(source.getClass(), sourceMethods);
+		sourceMethods.addAll(Arrays.asList(source.getClass().getDeclaredMethods()));	
 		
 		for (Method method : sourceMethods) {
 			Object result = getAcessorMethodGet(source, method);
@@ -32,6 +32,15 @@ public class JavaBeanUtils {
 			}
 		}
 	}
+	
+	
+	private void getSuperClassDeclaredMethods(Class clazz, List<Method> methods){
+		if (!clazz.getSuperclass().getName().equals("java.lang.Object")){
+			methods.addAll(Arrays.asList(clazz.getSuperclass().getDeclaredMethods()));
+			getSuperClassDeclaredMethods(clazz.getSuperclass(), methods);
+		}
+	}
+	
 
 	private String formatFieldName(Method method) {
 		String fieldName = method.getName().substring(3,4).toLowerCase() + method.getName().substring(4);
@@ -52,8 +61,8 @@ public class JavaBeanUtils {
 	private void getAcessorMethodSet(Object target, String methodName, Object value, String fieldName) throws Exception {
 
 		List<Method> targetMethods = new ArrayList<Method>();
-					 targetMethods.addAll(Arrays.asList(target.getClass().getSuperclass().getDeclaredMethods()));
-					 targetMethods.addAll(Arrays.asList(target.getClass().getDeclaredMethods()));
+		getSuperClassDeclaredMethods(target.getClass(), targetMethods);
+	    targetMethods.addAll(Arrays.asList(target.getClass().getDeclaredMethods()));
 		
 		Method methodAssign = null;
 		
