@@ -63,7 +63,7 @@ public class JavaBeanUtilsTest {
 
 		School school = new School();
 		school.setId(1L);
-		school.setDescription("UPFE-CIn");
+		school.setDescription("UFPE-CIn");
 
 		school.addPerson(person);
 		school.addPerson(person2);
