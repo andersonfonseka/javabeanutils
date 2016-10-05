@@ -5,21 +5,18 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
-import java.security.Permissions;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-
-import com.github.andersonfonseka.domain.Person;
+import java.util.Map;
 
 public class JavaBeanUtils {
 	
 	private static final String METHOD_ADD_ALL = "addAll";
 	private static final String METHOD_CLEAR = "clear";
-	private static final String METHOD_VALUE = "value";
+	private static final String METHOD_NAME = "name";
 	private static final String GET = "get";
 	private static final String SET = "set";
 	
@@ -27,35 +24,35 @@ public class JavaBeanUtils {
 
 	public void copyProperties(Object source, Object target) throws Exception {
 		
-		List<Method> sourceMethods = new ArrayList<Method>();
-		getSuperClassDeclaredMethods(source.getClass(), sourceMethods);
-		sourceMethods.addAll(Arrays.asList(source.getClass().getDeclaredMethods()));	
-		
+		List<Method> sourceMethods = getSourceMethods(source);	
+		copy(source, target, sourceMethods);
+	}
+
+	private void copy(Object source, Object target, List<Method> sourceMethods) throws Exception {
 		for (Method method : sourceMethods) {
 			Object result = getAcessorMethodGet(source, method);
 			
 			if (result != null){
-				String setterMethodName = SET + method.getName().substring(3);
+				String setterMethodName = SET.concat(method.getName().substring(3));
 				String fieldName = getFieldNameByMethod(method, source.getClass());
-				getAcessorMethodSet(target, setterMethodName, result, fieldName);
+				setFieldsForType(target, setterMethodName, result, fieldName);
 			}
 		}
 	}
-	
-	
 
+	private List<Method> getSourceMethods(Object source) {
+		List<Method> sourceMethods = new ArrayList<Method>();
+		getSuperClassDeclaredMethods(source.getClass(), sourceMethods);
+		sourceMethods.addAll(Arrays.asList(source.getClass().getDeclaredMethods()));
+		
+		return sourceMethods;
+	}
 
 	private void getSuperClassDeclaredMethods(Class<?> clazz, List<Method> methods){
 		if (!clazz.getSuperclass().getName().equals("java.lang.Object")){
 			methods.addAll(Arrays.asList(clazz.getSuperclass().getDeclaredMethods()));
 			getSuperClassDeclaredMethods(clazz.getSuperclass(), methods);
 		}
-	}
-	
-
-	private String formatFieldName(Method method) {
-		String fieldName = method.getName().substring(3,4).toLowerCase() + method.getName().substring(4);
-		return fieldName;
 	}
 
 	private Object getAcessorMethodGet(Object source, Method method) throws Exception {
@@ -69,12 +66,11 @@ public class JavaBeanUtils {
 		return null;
 	}
 	
-	private void getAcessorMethodSet(Object target, String methodName, Object value, String fieldName) throws Exception {
+	private void setFieldsForType(Object target, String methodName, Object value, String fieldName) throws Exception {
 
 		List<Method> targetMethods = new ArrayList<Method>();
 		getSuperClassDeclaredMethods(target.getClass(), targetMethods);
 	    targetMethods.addAll(Arrays.asList(target.getClass().getDeclaredMethods()));
-		
 		Method methodAssign = null;
 		
 		for (Method method : targetMethods) {
@@ -84,14 +80,22 @@ public class JavaBeanUtils {
 			}
 		}
 		
+		configureField(target, value, fieldName, methodAssign);
+	}
+
+	private void configureField(Object target, Object value, String fieldName, Method methodAssign)
+			throws IllegalAccessException, InvocationTargetException, Exception, NoSuchMethodException,
+			ClassNotFoundException {
+		
 		if (checkInstance(value)){
 			methodAssign.invoke(target, value);	
 			
-		} else if (value instanceof List) {
+		}else if (value instanceof Collection) {
 			assignValueForList(target, value, methodAssign, fieldName);
 			
-		} else if (value instanceof Collection) {
-			assignValueForCollection(target, value, methodAssign, fieldName);
+		}else if (value instanceof Map) {
+			//Map
+			//TODO Not Implemented
 			
 		}else if(value.getClass().isEnum()){
 			assignValueForEnum(target, value, methodAssign);
@@ -101,10 +105,10 @@ public class JavaBeanUtils {
 		}
 	}
 
-
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void assignValueForEnum(Object target, Object value, Method methodAssign)
 			throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-		String enumValue =(String) value.getClass().getDeclaredMethod(METHOD_VALUE).invoke(value);
+		String enumValue =(String) value.getClass().getMethod(METHOD_NAME).invoke(value);
 		methodAssign.invoke(target, Enum.valueOf((Class<Enum>) methodAssign.getParameterTypes()[0], enumValue));
 	}
 
@@ -113,12 +117,13 @@ public class JavaBeanUtils {
 		
 		Class<?> clazz = methodAssign.getParameterTypes()[0];
 		
-			Object objSource = value;
-			Object newObject = Class.forName(clazz.getName()).newInstance();
-			copyProperties(objSource, newObject);
-			methodAssign.invoke(target, newObject);
+		Object objSource = value;
+		Object newObject = Class.forName(clazz.getName()).newInstance();
+		copyProperties(objSource, newObject);
+		methodAssign.invoke(target, newObject);
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void assignValueForList(Object target, Object value, Method methodAssign, String fieldName) throws Exception {
 		List<?> objListSource = (List<?>) value;
 		List objecListTarget = (List<?>) Class.forName(value.getClass().getName()).newInstance();
@@ -156,21 +161,6 @@ public class JavaBeanUtils {
 	
 	protected String capitalize(String fieldName) {
 		return fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
-	}
-	
-	private void assignValueForCollection(Object target, Object value, Method methodAssign, String fieldName) throws Exception {
-		Collection<?> objListSource = (Collection<?>) value;
-		Collection objecListTarget = (Collection<?>) Class.forName(value.getClass().getName()).newInstance();
-		
-		Class<?> clazz = getGenericType(target.getClass(), fieldName);
-		
-		for (Object object : objListSource) {
-			Object newObject = Class.forName(clazz.getName()).newInstance();
-			copyProperties(object, newObject);
-			objecListTarget.add(newObject);
-		}
-		
-		methodAssign.invoke(target, objecListTarget);
 	}
 	
 	private boolean checkInstance(Object value){
@@ -219,4 +209,14 @@ public class JavaBeanUtils {
 		return fieldName;
 	}
 
+	/**
+	 * If the field is a instance of any class added, the reference is copied. Not create a new instance.
+	 * 
+	 * @param clazz Class to add.
+	 */
+	public void addCopyReferenceClass(Class<?> clazz){
+		if(listWrapperClass.contains(clazz)){
+			listWrapperClass.add(clazz);
+		}
+	}
 }
